@@ -391,9 +391,7 @@ tm_shape(LSOAshp) + tm_polygons() +
 tm_shape(BOROUGHshp) + tm_polygons(alpha = 0, border.alpha = 1, border.col = &quot;black&quot;) +
 # Apply cosmetics by adding compass and scale
 tm_compass(position = c(&quot;right&quot;, &quot;top&quot;)) + tm_scale_bar(position = c(&quot;left&quot;, &quot;bottom&quot;))</code></pre>
-<center>
-<p><img src="Tab1-image1.png" /></p>
-</center>
+<p><img src="index_files/figure-html/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;" /></p>
 <hr style="border:2px solid gray">
 </hr>
 </div>
@@ -530,9 +528,7 @@ tm_text(&quot;BOROUGHN&quot;, size = &quot;AREA&quot;) +
 tm_compass(position = c(&quot;right&quot;, &quot;top&quot;)) +
 tm_scale_bar(position = c(&quot;left&quot;, &quot;bottom&quot;)) +
 tm_layout(frame = FALSE, legend.title.size = 0.5, legend.text.size = 0.5)</code></pre>
-<center>
-<img src="Tab2-image3.png" />
-</center>
+<p><img src="index_files/figure-html/unnamed-chunk-16-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>Notice the spatial patterning and clusters of the LSOAs and the over-prediction (i.e., areas that have negative residuals, or blue tones) and under-prediction (i.e., areas that positive residuals, or red tones). This visual inspection of the residuals is telling you that spatial autocorrelation may be present here. This, however, would require a more formal test.</p>
 <p>Now, let use the Moran’s I test to confirm the presence of spatial autocorrelation. Recall last week’s lectures and computer labs session? Lets create the spatial adjacency matrix and apply the Moran’s I test on the <code>modelMLR</code> object using the <code>lm.morantest()</code> function.</p>
 <pre class="r"><code>#generate unique number for each row
@@ -659,9 +655,7 @@ tm_shape(spatialdatafile) + tm_fill(&quot;RESID_SLY&quot;, style = &quot;cont&qu
     tm_compass(position = c(&quot;right&quot;, &quot;top&quot;)) +
     tm_scale_bar(position = c(&quot;left&quot;, &quot;bottom&quot;)) +
     tm_layout(frame = FALSE, legend.title.size = 0.5, legend.text.size = 0.5)</code></pre>
-<center>
-<p><img src="Tab3-image1.png" /></p>
-</center>
+<p><img src="index_files/figure-html/unnamed-chunk-21-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p><strong>STEP FOUR</strong></p>
 <pre class="r"><code># Interpretation of results using impacts
 # impacts
@@ -827,9 +821,7 @@ tm_shape(spatialdatafile) + tm_fill(&quot;RESID_SER&quot;, style = &quot;cont&qu
     tm_compass(position = c(&quot;right&quot;, &quot;top&quot;)) +
     tm_scale_bar(position = c(&quot;left&quot;, &quot;bottom&quot;)) +
     tm_layout(frame = FALSE, legend.title.size = 0.5, legend.text.size = 0.5)</code></pre>
-<center>
-<img src="Tab3-image2.png" />
-</center>
+<p><img src="index_files/figure-html/unnamed-chunk-26-1.png" width="672" style="display: block; margin: auto;" /></p>
 <hr style="border:2px solid gray">
 </hr>
 </div>

@@ -149,7 +149,7 @@ BOROUGHshp <- read_sf("London Borough Areas.shp")
 The code chunk below generates an empty map with the `tmap` functions. It inspects the spatial configuration of London's 
 LSOA with the Boroughs superimposed.
 
-```{r fig.align="center", echo= TRUE}
+```{r, eval = FALSE}
 # Generate an empty map to visualise the spatial configuration and hierarchy of LSOA and Boroughs
 # First add LSOA layer 
 tm_shape(LSOAshp) + tm_polygons() +
@@ -158,6 +158,12 @@ tm_shape(BOROUGHshp) + tm_polygons(alpha = 0, border.alpha = 1, border.col = "bl
 # Apply cosmetics by adding compass and scale
 tm_compass(position = c("right", "top")) + tm_scale_bar(position = c("left", "bottom"))
 ```
+
+<center>
+
+![](Tab1-image1.png)
+
+</center>
 
 <hr style="border:2px solid gray"> </hr>
 
@@ -343,7 +349,7 @@ the legends (i.e., negative and positive value) therefore it best to specify in 
 and the `midpoint = 0`, and a divergent colour scheme e.g. Reds to Blue (`-RdBu`).
 
 
-```{r fig.align="center", echo= TRUE}
+```{r, eval = FALSE}
 tm_shape(spatialdatafile) + tm_fill("RESIDUALS", style = "cont", midpoint = 0, palette = "-RdBu") +
 tm_shape(BOROUGHshp) + tm_polygons(alpha = 0, border.alpha = 1, border.col = "black") +
 tm_text("BOROUGHN", size = "AREA") +
@@ -351,6 +357,10 @@ tm_compass(position = c("right", "top")) +
 tm_scale_bar(position = c("left", "bottom")) +
 tm_layout(frame = FALSE, legend.title.size = 0.5, legend.text.size = 0.5)
 ```
+
+<center>
+![](Tab2-image3.png)
+</center>
 
 Notice the spatial patterning and clusters of the LSOAs and the over-prediction (i.e., areas that have negative residuals, 
 or blue tones) and under-prediction (i.e., areas that positive residuals, or red tones). This visual inspection of the 
@@ -484,7 +494,7 @@ has accounted for a lot of spatial autocorrelation although it still significant
 
 **IMPORTANT NOTE**: We have to make a mental note of this and compare it with the performance of the Spatial Error Model. 
 
-```{r fig.align="center", echo= TRUE}
+```{r, eval = FALSE}
 # generate the map
 tm_shape(spatialdatafile) + tm_fill("RESID_SLY", style = "cont", midpoint = 0, palette = "-RdBu") +
 	tm_shape(BOROUGHshp) + tm_polygons(alpha = 0, border.alpha = 1, border.col = "black") +
@@ -493,6 +503,12 @@ tm_shape(spatialdatafile) + tm_fill("RESID_SLY", style = "cont", midpoint = 0, p
 	tm_scale_bar(position = c("left", "bottom")) +
 	tm_layout(frame = FALSE, legend.title.size = 0.5, legend.text.size = 0.5)
 ```
+
+<center>
+
+![](Tab3-image1.png)
+
+</center>
 
 **STEP FOUR**
 ```{r, message=FALSE, warning=FALSE}
@@ -551,7 +567,7 @@ moran.mc(spatialdatafile$RESID_SER, Residual_WeightMatrix, 1000, zero.policy = T
 
 **IMPORTANT NOTE**:  
 
-```{r fig.align="center", echo= TRUE}
+```{r, eval = FALSE}
 # generate the map
 tm_shape(spatialdatafile) + tm_fill("RESID_SER", style = "cont", midpoint = 0, palette = "-RdBu") +
 	tm_shape(BOROUGHshp) + tm_polygons(alpha = 0, border.alpha = 1, border.col = "black") +
@@ -560,6 +576,11 @@ tm_shape(spatialdatafile) + tm_fill("RESID_SER", style = "cont", midpoint = 0, p
 	tm_scale_bar(position = c("left", "bottom")) +
 	tm_layout(frame = FALSE, legend.title.size = 0.5, legend.text.size = 0.5)
 ```
+
+<center>
+
+![](Tab3-image2.png)
+</center>
 
 <hr style="border:2px solid gray"> </hr>
 

@@ -184,3 +184,35 @@ tm_shape(spatialdatafile) + tm_fill("RESID_SER", style = "cont", midpoint = 0, p
 
 
 lm.LMtests(modelMLR, Residual_WeightMatrix, test = c("LMerr","LMlag"))
+
+
+# Generate an empty map to visualise the spatial configuration and hierarchy of LSOA and Boroughs
+# First add LSOA layer 
+tm_shape(LSOAshp) + tm_polygons() +
+	# Add Borough layer on top of LSOA layer and make it transparent with alpha = 0
+	tm_shape(BOROUGHshp) + tm_polygons(alpha = 0, border.alpha = 1, border.col = "black") +
+	# Apply cosmetics by adding compass and scale
+	tm_compass(position = c("right", "top")) + tm_scale_bar(position = c("left", "bottom"))
+
+
+tm_shape(spatialdatafile) + tm_fill("RESIDUALS", style = "cont", midpoint = 0, palette = "-RdBu") +
+	tm_shape(BOROUGHshp) + tm_polygons(alpha = 0, border.alpha = 1, border.col = "black") +
+	tm_text("BOROUGHN", size = "AREA") +
+	tm_compass(position = c("right", "top")) +
+	tm_scale_bar(position = c("left", "bottom")) +
+	tm_layout(frame = FALSE, legend.title.size = 0.5, legend.text.size = 0.5)
+
+tm_shape(spatialdatafile) + tm_fill("RESID_SLY", style = "cont", midpoint = 0, palette = "-RdBu") +
+	tm_shape(BOROUGHshp) + tm_polygons(alpha = 0, border.alpha = 1, border.col = "black") +
+	tm_text("BOROUGHN", size = "AREA") +
+	tm_compass(position = c("right", "top")) +
+	tm_scale_bar(position = c("left", "bottom")) +
+	tm_layout(frame = FALSE, legend.title.size = 0.5, legend.text.size = 0.5)
+
+
+tm_shape(spatialdatafile) + tm_fill("RESID_SER", style = "cont", midpoint = 0, palette = "-RdBu") +
+	tm_shape(BOROUGHshp) + tm_polygons(alpha = 0, border.alpha = 1, border.col = "black") +
+	tm_text("BOROUGHN", size = "AREA") +
+	tm_compass(position = c("right", "top")) +
+	tm_scale_bar(position = c("left", "bottom")) +
+	tm_layout(frame = FALSE, legend.title.size = 0.5, legend.text.size = 0.5)
