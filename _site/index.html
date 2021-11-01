@@ -392,7 +392,10 @@ tm_shape(BOROUGHshp) + tm_polygons(alpha = 0, border.alpha = 1, border.col = &qu
 # Apply cosmetics by adding compass and scale
 tm_compass(position = c(&quot;right&quot;, &quot;top&quot;)) + tm_scale_bar(position = c(&quot;left&quot;, &quot;bottom&quot;))</code></pre>
 <center>
-<p><img src="Tab1-image1.png" /></p>
+<div class="figure">
+<img src="Tab1-image1.png" alt="" />
+<p class="caption">“/Users/anwarmusah/Documents/GITHUB/GEOG0114-PSA-WK5/docs”</p>
+</div>
 </center>
 <hr style="border:2px solid gray">
 </hr>
@@ -430,7 +433,7 @@ tm_layout(frame = FALSE, legend.title.size = 0.5, legend.text.size = 0.5)
 # plot the image object
 plot1</code></pre>
 <center>
-<img src="Tab2-image1.png" />
+<img src="Tab2-image1.png" title="fig:" alt="“/Users/anwarmusah/Documents/GITHUB/GEOG0114-PSA-WK5/docs”" />
 </center>
 <p><br></p>
 <p>Descriptively, we can observe already an interesting pattern. LSOAs in parts of North, Central and the central West of Inner London tend to have high-priced properties on average exceeding <code>£758,000.00</code>, whereas in parts of Hillingdon, Enfield, Croydon, Bexley, Barking &amp; Dagenham have on average cheaper properties below <code>£273,000.00</code>. We need to take note that the patterns look clustered; however, this descriptive reporting is by no means an evidence-based analysis for assessing clustering or dispersion (i.e., spatial autocorrelation) - a Moran’s I test will be able to diagnosis this problem for house price but when other factors are involved we will need to use the residuals in the Moran’s I test.</p>
@@ -464,7 +467,7 @@ plot4 &lt;- tm_shape(spatialdatafile) + tm_fill(&quot;PTACAT&quot;, style = &quo
 # stitch the maps together using tmap_arrange() function
 tmap_arrange(plot1, plot2, plot3, plot4, nrow = 2)</code></pre>
 <center>
-<img src="Tab2-image2.png" />
+<img src="Tab2-image2.png" title="fig:" alt="“/Users/anwarmusah/Documents/GITHUB/GEOG0114-PSA-WK5/docs”" />
 </center>
 <p><br></p>
 <p>Visually, the income appears to be strongly correlated with house price. The patterns for socioeconomic deprivation on the other hand appears to have a negative correlation with house price. PTA’s relationship is unclear.</p>
@@ -531,7 +534,7 @@ tm_compass(position = c(&quot;right&quot;, &quot;top&quot;)) +
 tm_scale_bar(position = c(&quot;left&quot;, &quot;bottom&quot;)) +
 tm_layout(frame = FALSE, legend.title.size = 0.5, legend.text.size = 0.5)</code></pre>
 <center>
-<img src="Tab2-image3.png" />
+<img src="Tab2-image3.png" title="fig:" alt="“/Users/anwarmusah/Documents/GITHUB/GEOG0114-PSA-WK5/docs”" />
 </center>
 <p>Notice the spatial patterning and clusters of the LSOAs and the over-prediction (i.e., areas that have negative residuals, or blue tones) and under-prediction (i.e., areas that positive residuals, or red tones). This visual inspection of the residuals is telling you that spatial autocorrelation may be present here. This, however, would require a more formal test.</p>
 <p>Now, let use the Moran’s I test to confirm the presence of spatial autocorrelation. Recall last week’s lectures and computer labs session? Lets create the spatial adjacency matrix and apply the Moran’s I test on the <code>modelMLR</code> object using the <code>lm.morantest()</code> function.</p>
@@ -660,7 +663,10 @@ tm_shape(spatialdatafile) + tm_fill(&quot;RESID_SLY&quot;, style = &quot;cont&qu
     tm_scale_bar(position = c(&quot;left&quot;, &quot;bottom&quot;)) +
     tm_layout(frame = FALSE, legend.title.size = 0.5, legend.text.size = 0.5)</code></pre>
 <center>
-<p><img src="Tab3-image1.png" /></p>
+<div class="figure">
+<img src="Tab3-image1.png" alt="" />
+<p class="caption">“/Users/anwarmusah/Documents/GITHUB/GEOG0114-PSA-WK5/docs”</p>
+</div>
 </center>
 <p><strong>STEP FOUR</strong></p>
 <pre class="r"><code># Interpretation of results using impacts
@@ -828,7 +834,7 @@ tm_shape(spatialdatafile) + tm_fill(&quot;RESID_SER&quot;, style = &quot;cont&qu
     tm_scale_bar(position = c(&quot;left&quot;, &quot;bottom&quot;)) +
     tm_layout(frame = FALSE, legend.title.size = 0.5, legend.text.size = 0.5)</code></pre>
 <center>
-<img src="Tab3-image2.png" />
+<img src="Tab3-image2.png" title="fig:" alt="“/Users/anwarmusah/Documents/GITHUB/GEOG0114-PSA-WK5/docs”" />
 </center>
 <hr style="border:2px solid gray">
 </hr>

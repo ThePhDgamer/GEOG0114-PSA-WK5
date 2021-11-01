@@ -161,7 +161,7 @@ tm_compass(position = c("right", "top")) + tm_scale_bar(position = c("left", "bo
 
 <center>
 
-![](Tab1-image1.png)
+!["/Users/anwarmusah/Documents/GITHUB/GEOG0114-PSA-WK5/docs"](Tab1-image1.png)
 
 </center>
 
@@ -222,7 +222,7 @@ plot1
 ```
 
 <center>
-![](Tab2-image1.png)
+!["/Users/anwarmusah/Documents/GITHUB/GEOG0114-PSA-WK5/docs"](Tab2-image1.png)
 </center>
 
 <br>
@@ -270,7 +270,7 @@ tmap_arrange(plot1, plot2, plot3, plot4, nrow = 2)
 ```
 
 <center>
-![](Tab2-image2.png)
+!["/Users/anwarmusah/Documents/GITHUB/GEOG0114-PSA-WK5/docs"](Tab2-image2.png)
 </center>
 
 <br>
@@ -359,7 +359,7 @@ tm_layout(frame = FALSE, legend.title.size = 0.5, legend.text.size = 0.5)
 ```
 
 <center>
-![](Tab2-image3.png)
+!["/Users/anwarmusah/Documents/GITHUB/GEOG0114-PSA-WK5/docs"](Tab2-image3.png)
 </center>
 
 Notice the spatial patterning and clusters of the LSOAs and the over-prediction (i.e., areas that have negative residuals, 
@@ -506,7 +506,7 @@ tm_shape(spatialdatafile) + tm_fill("RESID_SLY", style = "cont", midpoint = 0, p
 
 <center>
 
-![](Tab3-image1.png)
+!["/Users/anwarmusah/Documents/GITHUB/GEOG0114-PSA-WK5/docs"](Tab3-image1.png)
 
 </center>
 
@@ -579,7 +579,7 @@ tm_shape(spatialdatafile) + tm_fill("RESID_SER", style = "cont", midpoint = 0, p
 
 <center>
 
-![](Tab3-image2.png)
+!["/Users/anwarmusah/Documents/GITHUB/GEOG0114-PSA-WK5/docs"](Tab3-image2.png)
 </center>
 
 <hr style="border:2px solid gray"> </hr>
