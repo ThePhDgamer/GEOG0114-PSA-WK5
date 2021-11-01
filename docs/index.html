@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>Introduction to Spatial Regression Models</title>
+
+<script src="site_libs/header-attrs-2.9/header-attrs.js"></script>
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet" />
+<script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.tab('show');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">GEOG0114 Principles of Spatial Analysis</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore"><strong>Introduction to Spatial Regression Models</strong></h1>
+<h4 class="date"><strong>Week 5: 01/11/2021</strong></h4>
+
+</div>
+
+
+<style type: "text/css">
+h1.title {
+    font-size: 20px;
+}
+
+h4.date {
+    font-size: 18px;
+}
+
+h1 {
+    font-size: 18px;
+}
+
+body{/* Normal */
+    font-size: 13px;
+    text-align: justify;
+}
+
+code.r{
+  font-size: 10px;
+}
+pre {
+  font-size: 12px
+}
+</style>
+<hr style="border:2px solid gray">
+</hr>
+<div id="section" class="section level1 tabset">
+<h1 class="tabset"></h1>
+<div id="getting-started" class="section level2">
+<h2><strong>1. Getting started</strong></h2>
+<p><strong>1.1. Let’s begin</strong></p>
+<p>This session builds on the techniques taught in last week’s tutorials focused on spatial dependence &amp; spatial autocorrelation. Today, you will learn how to build spatially-based regression models for dealing with spatial autocorrelation whenever you want to determine relationship between an outcome and other independent variables. In this exercise we will be using London’s Lower Super Output Area (LSOA) data from 2015 pertained to house prices (as a dependent variable), and assessing it’s relationship with public transport accessibility (PTA), average income and socioeconomic deprivation (IMD) as independent variables while accounting for spatial autocorrelation.</p>
+<p>We will implement three models:</p>
+<ul>
+<li>Multivariable linear regression</li>
+<li>Spatial lag regression</li>
+<li>Spatial error regression</li>
+</ul>
+<p>Before you begin do make sure to download all data from <a href="https://moodle.ucl.ac.uk"><strong>Moodle</strong></a>. If you are working from a UCL workstation, do create a folder called “<strong>Week 5</strong>” within your “<strong>GEOG0114</strong>” folder stored in the N-drive.</p>
+<p>Extract all data from the zip folder and stored into “<strong>Week 5</strong>” folder. Open a new R script and set the work directory to Week 5’s folder (i.e., <strong>Home (N:) &gt; GEOG0114 &gt; Week 5</strong>)</p>
+<pre class="r"><code># Set working directory to Week 5 folder
+setwd(&quot;N:/GEOG0114/Week 5&quot;)</code></pre>
+<p><strong>1.2. Loading and installing packages</strong></p>
+<p>We will need to load the following packages:</p>
+<ul>
+<li><code>sf</code>: Simple Features</li>
+<li><code>tmap</code>: Thematic Mapping</li>
+<li><code>spdep</code>: Spatial Dependence (Weighting schemes &amp; Spatial Statistics)</li>
+<li><code>sp</code>: Package for providing classes for spatial data (points, lines, polygons and grids)</li>
+</ul>
+<pre class="r"><code># Load packages using library() function
+library(&quot;sf&quot;)
+library(&quot;tmap&quot;)
+library(&quot;spdep&quot;)
+library(&quot;sp&quot;)</code></pre>
+<p>The above packages <code>sf</code>, <code>tmap</code>, <code>spdep</code> &amp; <code>sp</code> should have been installed in the previous session(s).</p>
+<p>We will need to install the following packages:</p>
+<ul>
+<li><code>spatialreg</code>: provides functions for spatial regression modelling.</li>
+</ul>
+<pre class="r"><code># Install the packages: spatialreg using the install.package()
+install.packages(&quot;spatialreg&quot;)
+
+# Load the packages with library()
+library(&quot;spatialreg&quot;)</code></pre>
+<p><strong>1.3. Loading datasets</strong></p>
+<p>Let us first import the quantitative data i.e., <code>London LSOA 2015 data.csv</code> into R/RStudio.</p>
+<pre class="r"><code># Use read.csv() to import 
+datafile &lt;- read.csv(file = &quot;London LSOA 2015 data.csv&quot;, header = TRUE, sep = &quot;,&quot;)</code></pre>
+<p><strong>NOTE</strong>: The description of the column names are as follows:</p>
+<table>
+<colgroup>
+<col width="48%" />
+<col width="52%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Column Name</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>LSOACODE</code></td>
+<td>Unique identification code for the geographic area</td>
+</tr>
+<tr class="even">
+<td><code>AVEPRICE</code> (Dependent variable)</td>
+<td>Average house price estimated for the LSOA in 2015</td>
+</tr>
+<tr class="odd">
+<td><code>AVEINCOME</code></td>
+<td>Estimated average annual income for households within an LSOA in 2015</td>
+</tr>
+<tr class="even">
+<td><code>IMDSCORE</code></td>
+<td>Deprivation score for an LSOA in 2015</td>
+</tr>
+<tr class="odd">
+<td><code>PTAINDEX</code></td>
+<td>Measures levels of access/connectivity to public transport</td>
+</tr>
+<tr class="even">
+<td><code>PTACAT</code></td>
+<td><code>PTAINDEX</code> rendered into a categorical variable</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>The above data were sourced from the <a href="https://data.london.gov.uk/dataset/"><strong>London DATASTORE</strong></a>. Next, we import the shape files for London (i.e., LSOA- and Borough-level):</p>
+<ul>
+<li>London LSOA shape file: <code>London LSOA Areas.shp</code></li>
+<li>London Borough shape file: <code>London Borough Areas.shp</code></li>
+</ul>
+<pre class="r"><code># Use read_sf() function to load shape file 
+LSOAshp &lt;- read_sf(&quot;London LSOA Areas.shp&quot;)
+BOROUGHshp &lt;- read_sf(&quot;London Borough Areas.shp&quot;)</code></pre>
+<p>The code chunk below generates an empty map with the <code>tmap</code> functions. It inspects the spatial configuration of London’s LSOA with the Boroughs superimposed.</p>
+<pre class="r"><code># Generate an empty map to visualise the spatial configuration and hierarchy of LSOA and Boroughs
+# First add LSOA layer 
+tm_shape(LSOAshp) + tm_polygons() +
+# Add Borough layer on top of LSOA layer and make it transparent with alpha = 0
+tm_shape(BOROUGHshp) + tm_polygons(alpha = 0, border.alpha = 1, border.col = &quot;black&quot;) +
+# Apply cosmetics by adding compass and scale
+tm_compass(position = c(&quot;right&quot;, &quot;top&quot;)) + tm_scale_bar(position = c(&quot;left&quot;, &quot;bottom&quot;))</code></pre>
+<p><img src="index_files/figure-html/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;" /></p>
+<hr style="border:2px solid gray">
+</hr>
+</div>
+<div id="diagnostics-of-residuals" class="section level2">
+<h2><strong>2. Diagnostics of Residuals</strong></h2>
+<p><strong>2.1. Reporting basic summary statistical measures</strong></p>
+<p>For any statistical &amp; spatial analysis its always useful to conduct some descriptive analysis of your dataset. You can obtain basic summary measures using the <code>summary()</code> function which reports the overall result i.e., <strong>minimum</strong>, <strong>maximum</strong>, <strong>median</strong>, <strong>mean</strong>, <strong>25th</strong> and <strong>75th</strong> percentile values. For instance, we can report these estimates for the house price variable:</p>
+<pre class="r"><code>summary(datafile$AVEPRICE)</code></pre>
+<pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##  133997  310040  409982  528509  590064 5751342</code></pre>
+<p>We can see that the mean price across the LSOAs is <code>£528,509</code> with ranges from <code>£133,997</code> to <code>£5,751,342</code>. You can also report the standard deviation across all LSOAs using the <code>sd()</code> function. As you can see the result is large and estimated as <code>±£418,842.5</code>.</p>
+<pre class="r"><code>sd(datafile$AVEPRICE)</code></pre>
+<pre><code>## [1] 418842.5</code></pre>
+<p><strong>NOTE</strong>: We have compiled some useful functions for reporting basic measures for descriptive analysis of the fly:</p>
+<ul>
+<li><code>min()</code>: minimum</li>
+<li><code>max()</code>: maximum</li>
+<li><code>mean()</code>: mean</li>
+<li><code>median()</code>: median</li>
+<li><code>sd()</code>: standard deviation</li>
+</ul>
+<p><strong>2.2. Reporting the spatial distribution of our variables</strong></p>
+<p>Now lets examine the spatial distribution for the house price. First, the LSOA data is stored in <code>datafile</code> which is just a data frame object. We need to merge this to the spatial object <code>LSOAshp</code> before using the <code>tmap</code> functions. Lets create a new spatial data frame and name it <code>spatialdatafile</code></p>
+<pre class="r"><code># Merge datafile to LSOAshp uniquely by using &quot;LSOACODE column
+spatialdatafile &lt;- merge(LSOAshp, datafile, by.x = &quot;LSOACODE&quot;, by.y = &quot;LSOACODE&quot;)</code></pre>
+<p>Lets now generate our first map to inspect the distribution of house prices. We can actually store a picture as an image object called <code>plot1</code></p>
+<pre class="r"><code>plot1 &lt;- tm_shape(spatialdatafile) + tm_fill(&quot;AVEPRICE&quot;, style = &quot;quantile&quot;, n = 7, palette = &quot;Greens&quot;) +
+tm_shape(BOROUGHshp) + tm_polygons(alpha = 0, border.alpha = 1, border.col = &quot;black&quot;) +
+tm_text(&quot;BOROUGHN&quot;, size = &quot;AREA&quot;) +
+tm_compass(position = c(&quot;right&quot;, &quot;top&quot;)) +
+tm_scale_bar(position = c(&quot;left&quot;, &quot;bottom&quot;)) +
+tm_layout(frame = FALSE, legend.title.size = 0.5, legend.text.size = 0.5)
+
+# plot the image object
+plot1</code></pre>
+<center>
+<img src="Tab2-image1.png" />
+</center>
+<p><br></p>
+<p>Descriptively, we can observe already an interesting pattern. LSOAs in parts of North, Central and the central West of Inner London tend to have high-priced properties on average exceeding <code>£758,000.00</code>, whereas in parts of Hillingdon, Enfield, Croydon, Bexley, Barking &amp; Dagenham have on average cheaper properties below <code>£273,000.00</code>. We need to take note that the patterns look clustered; however, this descriptive reporting is by no means an evidence-based analysis for assessing clustering or dispersion (i.e., spatial autocorrelation) - a Moran’s I test will be able to diagnosis this problem for house price but when other factors are involved we will need to use the residuals in the Moran’s I test.</p>
+<p>Let us visualise three other variables which will subsequently be treated as independent variables in a regression to eyeball whether they are correlated with the house prices. Let us plot maps for income, deprivation and PAT (categories); and then stitch them together by invoking the <code>tmap_arrange()</code> function.</p>
+<pre class="r"><code># create 3 separate maps and store them in plot2, plot3 &amp; plot4 objects
+
+# map for income
+plot2 &lt;- tm_shape(spatialdatafile) + tm_fill(&quot;AVEINCOME&quot;, style = &quot;quantile&quot;, n = 7, palette = &quot;Oranges&quot;) +
+    tm_shape(BOROUGHshp) + tm_polygons(alpha = 0, border.alpha = 1, border.col = &quot;black&quot;) +
+    tm_text(&quot;BOROUGHN&quot;, size = &quot;AREA&quot;) +
+    tm_compass(position = c(&quot;right&quot;, &quot;top&quot;)) +
+    tm_scale_bar(position = c(&quot;left&quot;, &quot;bottom&quot;)) +
+    tm_layout(frame = FALSE, legend.title.size = 0.5, legend.text.size = 0.5)
+
+# map for socioeconomic deprivation
+plot3 &lt;- tm_shape(spatialdatafile) + tm_fill(&quot;IMDSCORE&quot;, style = &quot;quantile&quot;, n = 7, palette = &quot;Reds&quot;) +
+    tm_shape(BOROUGHshp) + tm_polygons(alpha = 0, border.alpha = 1, border.col = &quot;black&quot;) +
+    tm_text(&quot;BOROUGHN&quot;, size = &quot;AREA&quot;) +
+    tm_compass(position = c(&quot;right&quot;, &quot;top&quot;)) +
+    tm_scale_bar(position = c(&quot;left&quot;, &quot;bottom&quot;)) +
+    tm_layout(frame = FALSE, legend.title.size = 0.5, legend.text.size = 0.5)
+
+# map for public transport accessibility categories (PTACAT)
+plot4 &lt;- tm_shape(spatialdatafile) + tm_fill(&quot;PTACAT&quot;, style = &quot;cat&quot;, palette = &quot;Blues&quot;) +
+    tm_shape(BOROUGHshp) + tm_polygons(alpha = 0, border.alpha = 1, border.col = &quot;black&quot;) +
+    tm_text(&quot;BOROUGHN&quot;, size = &quot;AREA&quot;) +
+    tm_compass(position = c(&quot;right&quot;, &quot;top&quot;)) +
+    tm_scale_bar(position = c(&quot;left&quot;, &quot;bottom&quot;)) +
+    tm_layout(frame = FALSE, legend.title.size = 0.5, legend.text.size = 0.5)
+
+# stitch the maps together using tmap_arrange() function
+tmap_arrange(plot1, plot2, plot3, plot4, nrow = 2)</code></pre>
+<center>
+<img src="Tab2-image2.png" />
+</center>
+<p><br></p>
+<p>Visually, the income appears to be strongly correlated with house price. The patterns for socioeconomic deprivation on the other hand appears to have a negative correlation with house price. PTA’s relationship is unclear.</p>
+<p><strong>2.3. Fitting a non-spatial Linear Regression on spatial data &amp; checking the residuals</strong></p>
+<p>Next, we are going to fit a linear regression where the response variable is <code>AVEPRICE</code> and the predictors are <code>AVEINCOME</code>, <code>IMDSCORE</code> and <code>PTACAT</code>, and then extract the residuals from the model in order to test for spatial autocorrelation.</p>
+<p>When fitting a linear regression - we must test that the residuals have the following properties:</p>
+<ul>
+<li>The residuals should exhibit a normal distribution.</li>
+<li>Residuals must be homoscedasticity and exhibit a constant random when plotted against the fitted prediction</li>
+<li>The residual should not deviate too much away from the index line in the <code>QQ-plot</code>.</li>
+</ul>
+<p><strong>IMPORTANT NOTE</strong>: Things that can violate the above requirements for our residuals are the variables inputted to the model being very skewed. In our case, all variables are very skewed. So, it is best to transform them using the <code>log10()</code> scale. Just do this transformation in the models since, we only care about the residuals. Note that there is no right or wrong when it comes to implementing the transformation, as long as the assumption for the residuals from a linear regression are not violated then all is fine.</p>
+<p>If one of these characteristics are violated then its an indication that the data are not independent. This could possibly be due to some data artefact (i.e., a critical error in the data itself), or the residuals being correlated with each other. If they are correlated, then we should check first by mapping the residuals on the map to examine it’s spatial patterns for clustering and testing it with the Moran’s I test.</p>
+<p>Let’s demonstrate by using the built-in function <code>lm()</code> to create a simple linear or multivariable linear regression.</p>
+<pre class="r"><code># lm() function builds a regression model and stores model output into the object &#39;modelMLR&#39;
+modelMLR &lt;- lm(log10(AVEPRICE) ~ log10(AVEINCOME) + log10(IMDSCORE) + log10(PTAINDEX), data = spatialdatafile)
+# Include the &#39;scipen=7&#39; argument in the summary() function remove those annoying scientific notation!
+options(scipen = 7)
+# summary() calls report the output stored in object &#39;modelMLR&#39;
+summary(modelMLR)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = log10(AVEPRICE) ~ log10(AVEINCOME) + log10(IMDSCORE) + 
+##     log10(PTAINDEX), data = spatialdatafile)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -0.39249 -0.06489 -0.00572  0.06046  0.62993 
+## 
+## Coefficients:
+##                   Estimate Std. Error t value       Pr(&gt;|t|)    
+## (Intercept)      -4.100992   0.095592 -42.901        &lt; 2e-16 ***
+## log10(AVEINCOME)  2.036354   0.019340 105.292        &lt; 2e-16 ***
+## log10(IMDSCORE)   0.136713   0.007681  17.798        &lt; 2e-16 ***
+## log10(PTAINDEX)   0.030055   0.004816   6.241 0.000000000471 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.1027 on 4964 degrees of freedom
+## Multiple R-squared:  0.789,  Adjusted R-squared:  0.7889 
+## F-statistic:  6189 on 3 and 4964 DF,  p-value: &lt; 2.2e-16</code></pre>
+<p><strong>IMPORTANT SIDENOTE:</strong> The above results presented in the above table indicates the relationship between the dependent and independent variable. Under the column for <code>Estimate</code> reports the overall intercept and coefficients for each independent variable. The p-values for the estimates are reported under the column <code>Pr(&gt;|t|)</code> which determines whether the relationship between the dependent and independent variables are statistically significant or not.</p>
+<p>Lastly, the other two important pieces of information is the <code>Adjusted R-Squared</code> value and the model’s <code>p-value</code> at the bottom. These tells us the performance of the model in general. The former tells you the percentage of variation explained in the house price when including <code>AVEINCOME</code>, <code>IMDSCORE</code>, <code>PTAINDEX</code> in the regression, while the latter informs us whether if this is significant or not.</p>
+<p><strong>HOW TO INTERPRET RESULTS:</strong> This is how we fully interpret the coefficients and model performance from the above table:</p>
+<ul>
+<li>On a log transformed scale, if the <code>AVEINCOME</code> was to increase by <code>1.0%</code>, we expect the house prices to increase by <code>2.04%</code> and this average increase is statistically significant since the p-value = <code>0.00000000002</code> &lt;<code>0.05</code>.</li>
+<li>On a log transformed scale, if the <code>PTAINDEX</code> was to increase by <code>1.0%</code>, we expect the house prices to increase marginally by <code>0.03%</code>. The marginally increase is statistically significant since the p-value = <code>0.000000000471</code> &lt; <code>0.05</code>.</li>
+<li>On a log transformed scale, if the <code>IMDSCORE</code> was to increase by <code>1.0%</code>, we expect the house prices to increase marginally by <code>0.13%</code> and this average increase is statistically significant since the p-value = <code>0.00000000002</code> &lt;<code>0.05</code>.</li>
+<li>In terms of model performance: according to the <code>Adjusted R-Squared</code> value <code>0.7889 (78.89%)</code> of the variation in the house prices across LSOAs were explained by the model after accounting for <code>AVEINCOME</code>, <code>IMDSCORE</code>, <code>PTAINDEX</code>. Since the <code>Adjusted R-Squared</code> more than <code>50.0%</code> it is hence a very good model and significant (i.e., p-value = <code>0.0000000002</code> &lt; <code>0.05</code>).</li>
+</ul>
+<p>Now that we have fitted the model, we can extract the residuals and insert them as a new column into the <code>spatialdatafile</code>. To perform this action, use the <code>modelMLR</code> object and extract the residuals output from it.</p>
+<pre class="r"><code># Extract residuals from &quot;modelLMR&quot; object and dump into &quot;spatialdatafile&quot; and call the column &quot;RESIDUALS&quot;
+spatialdatafile$RESIDUALS &lt;- modelMLR$residuals
+
+# Reporting basic summary measures to have an idea of its distribution before plotting them on map
+summary(spatialdatafile$RESIDUALS)</code></pre>
+<pre><code>##      Min.   1st Qu.    Median      Mean   3rd Qu.      Max. 
+## -0.392492 -0.064891 -0.005722  0.000000  0.060463  0.629932</code></pre>
+<p>Let us generate a map to examine if these residuals show patterns of spatial autocorrelation. We have divergent values for the legends (i.e., negative and positive value) therefore it best to specify in the <code>tm_fill()</code> function that <code>style = "cont"</code> and the <code>midpoint = 0</code>, and a divergent colour scheme e.g. Reds to Blue (<code>-RdBu</code>).</p>
+<pre class="r"><code>tm_shape(spatialdatafile) + tm_fill(&quot;RESIDUALS&quot;, style = &quot;cont&quot;, midpoint = 0, palette = &quot;-RdBu&quot;) +
+tm_shape(BOROUGHshp) + tm_polygons(alpha = 0, border.alpha = 1, border.col = &quot;black&quot;) +
+tm_text(&quot;BOROUGHN&quot;, size = &quot;AREA&quot;) +
+tm_compass(position = c(&quot;right&quot;, &quot;top&quot;)) +
+tm_scale_bar(position = c(&quot;left&quot;, &quot;bottom&quot;)) +
+tm_layout(frame = FALSE, legend.title.size = 0.5, legend.text.size = 0.5)</code></pre>
+<p><img src="index_files/figure-html/unnamed-chunk-16-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Notice the spatial patterning and clusters of the LSOAs and the over-prediction (i.e., areas that have negative residuals, or blue tones) and under-prediction (i.e., areas that positive residuals, or red tones). This visual inspection of the residuals is telling you that spatial autocorrelation may be present here. This, however, would require a more formal test.</p>
+<p>Now, let use the Moran’s I test to confirm the presence of spatial autocorrelation. Recall last week’s lectures and computer labs session? Lets create the spatial adjacency matrix and apply the Moran’s I test on the <code>modelMLR</code> object using the <code>lm.morantest()</code> function.</p>
+<pre class="r"><code>#generate unique number for each row
+spatialdatafile$ROWNUM &lt;- 1:nrow(spatialdatafile)
+# We need to coerce the sf spatialdatafile object into a new sp object
+spatialdatafile_2.0 &lt;- as(spatialdatafile, &quot;Spatial&quot;)
+# Create spatial weights matrix for areas
+Weights &lt;- poly2nb(spatialdatafile_2.0, row.names = spatialdatafile_2.0$ROWNUM)
+WeightsMatrix &lt;- nb2mat(Weights, style=&#39;B&#39;)
+Residual_WeightMatrix &lt;- mat2listw(WeightsMatrix , style=&#39;W&#39;)
+# Run the test on the regression model output object &quot;modelMLR&quot; using lm.morantest()
+lm.morantest(modelMLR, Residual_WeightMatrix, alternative=&quot;two.sided&quot;)</code></pre>
+<pre><code>## 
+##  Global Moran I for regression residuals
+## 
+## data:  
+## model: lm(formula = log10(AVEPRICE) ~ log10(AVEINCOME) +
+## log10(IMDSCORE) + log10(PTAINDEX), data = spatialdatafile)
+## weights: Residual_WeightMatrix
+## 
+## Moran I statistic standard deviate = 56.28, p-value &lt; 2.2e-16
+## alternative hypothesis: two.sided
+## sample estimates:
+## Observed Moran I      Expectation         Variance 
+##    0.47489527088   -0.00060260241    0.00007138138</code></pre>
+<p>You will notice we obtained a statistically significant value (i.e., p-value &lt;<code>0.001</code>) for Moran’s I of value = <code>0.475</code>. The value of the Moran’s I test somewhat high. This is an indication that the errors (the residuals) are somewhat related to each other and thus not independent. A spatial regression would be much appropriate for modelling this type of data since there’s evidence of spatial autocorrelation.</p>
+<hr style="border:2px solid gray">
+</hr>
+</div>
+<div id="spatial-regression-models" class="section level2">
+<h2><strong>3. Spatial Regression Models</strong></h2>
+<p><strong>3.1. Types of Spatial Lag and Error Models</strong></p>
+<p>At this point, we will introduce two kinds of spatial regressions models that can address the issues of spatial autocorrelation. These models are similar in a sense that they all require the inclusion of a spatial weight matrix to account for the spatial configuration of the areas under investigation.</p>
+<ul>
+<li>Spatial Lag Model lagged on the dependent variable</li>
+<li>Spatial Error Model</li>
+</ul>
+<p>Previously, we fitted a linear regression model that’s non-spatial, which takes the mathematical formula as follows:</p>
+<center>
+<p><span class="math display">\[y = \beta_{0} + x_{1}\beta_{1} + x_{2}\beta_{2} + ... +\epsilon\]</span></p>
+</center>
+<p>Here, <span class="math inline">\(y\)</span> is the response variable (i.e., <code>AVEPRICE</code>). The <span class="math inline">\(x_{1}\)</span>, <span class="math inline">\(x_{2}\)</span>., etc., are the independent variables (i.e, <span class="math inline">\(x_{1}\)</span>, <span class="math inline">\(x_{2}\)</span> &amp; <span class="math inline">\(x_{3}\)</span> are <code>AVEINCOME</code>, <code>IMDSCORE</code> and <code>PTAINDEX</code> respectively). <span class="math inline">\(\beta_{1}\)</span>, <span class="math inline">\(\beta_{2}\)</span>., etc., are the estimated coefficients for the independent variables. The <span class="math inline">\(\epsilon\)</span> represents the uncorrelated error term.</p>
+<p>To make this a <strong>Spatial Lag Model</strong> lagged on the <strong>dependent variable</strong>, we tweak the above equation by including the spatial weight matrix <span class="math inline">\(W\)</span> which is multiplied by the dependent variable <span class="math inline">\(y\)</span>. This product will have an estimated coefficient termed <span class="math inline">\(\rho\)</span>. The <span class="math inline">\(\rho\)</span> parameter tells us the degree at which our observed outcome inside the area of interest is influenced by outcomes measured from its neighbours. See model below:</p>
+<center>
+<span class="math display">\[y = \rho Wy + \beta_{0} + x_{1}\beta_{1} + x_{2}\beta_{2} + ... +\epsilon\]</span>
+</center>
+<p>The <strong>Spatial Error Model</strong>, on the other hand, incorporates spatial weight matrix <span class="math inline">\(W\)</span> into the error term, where <span class="math inline">\(\lambda\)</span> is an estimated coefficient for the product between <span class="math inline">\(W\)</span> and <span class="math inline">\(u\)</span>, which <span class="math inline">\(u\)</span> is a correlated spatial error term. See model below:</p>
+<center>
+<span class="math display">\[y =  + \beta_{0} + x_{1}\beta_{1} + x_{2}\beta_{2} + ...+ \lambda Wu +\epsilon\]</span>
+</center>
+<p>Here, we show you how to implement the two models to see which one better address the issue of spatial autocorrelation. But there are some important points:</p>
+<ul>
+<li>When implementing these models, we want to ensure that the spatial autocorrelation are accounted for, and therefore, we have to perform the Moran’s I test again. Here, we want to make sure that it is lower than what we observed for the linear regression model.</li>
+<li>We want to also compare the spatial model against the non-spatial model by checking the AIC values, the one with lowest is the better model.</li>
+<li>Previously, we were able to interpret the coefficients for the linear regression model. For the spatial models however, the coefficients derived from the model lagged on the dependent variable are difficult to interpret. Therefore, we have to estimate a quantity called <code>impacts</code> which we will use in the interpretation.</li>
+</ul>
+<p><strong>3.2. Spatial Lag Model lagged on the dependent variable</strong></p>
+<p>A Spatial Lag Model on the dependent variable assumes that dependencies exist directly among the levels of the dependent variable. That is, the observed outcome in one primary location is affected by other outcomes in nearby or neighbouring locations. For instance, if we implement this model on the LSOA house price, we are assuming that the property prices in one LSOA is impacted by the property prices from nearby neighbouring LSOAs.</p>
+<p>We can perform this analysis in four steps:</p>
+<ul>
+<li>Step 1: Fit the Spatial Lag Model with the dependent variable lagged using the <code>lagsarlm()</code> function.</li>
+<li>Step 2: Use the <code>summary()</code> function to report the results. Here, we are interested in the <span class="math inline">\(\rho\)</span> parameter &amp; its p-value. Here, we also want to check if the model is appropriate than a non-spatial model - examine the AIC (for lag versus LM) and the one with the lowest AIC is the better model.</li>
+<li>Step 3: Extract the residual lags for the model object and carry out a Moran’s I test using <code>moran.mc()</code> to ensure that the statistic is less than what was obtained for the Moran’s I test for the linear model. Use the <code>tmap</code> to examine its spatial patterning.</li>
+<li>Step 4: Interpretation of the parameters using the <code>impact()</code> function</li>
+</ul>
+<p><strong>STEP ONE</strong></p>
+<pre class="r"><code># Fit model using lagsarlm()
+# reuse spatial weight matrix created earlier as an object called &quot;Residual_WeighMatrix&quot; 
+modelSLY &lt;- lagsarlm(log10(AVEPRICE) ~ log10(IMDSCORE) + log10(AVEINCOME) + log10(PTAINDEX), data = spatialdatafile_2.0, Residual_WeightMatrix)</code></pre>
+<p><strong>STEP TWO</strong></p>
+<pre class="r"><code># Report results with summary()
+# We are interested in the rho-coefficient, log-likelihood ratio test&#39;s p-value and the AIC
+summary(modelSLY)</code></pre>
+<pre><code>## 
+## Call:lagsarlm(formula = log10(AVEPRICE) ~ log10(IMDSCORE) + log10(AVEINCOME) + 
+##     log10(PTAINDEX), data = spatialdatafile, listw = Residual_WeightMatrix)
+## 
+## Residuals:
+##        Min         1Q     Median         3Q        Max 
+## -0.3608275 -0.0540603 -0.0039772  0.0518209  0.6492007 
+## 
+## Type: lag 
+## Coefficients: (asymptotic standard errors) 
+##                    Estimate Std. Error  z value  Pr(&gt;|z|)
+## (Intercept)      -2.6649683  0.0924917 -28.8130 &lt; 2.2e-16
+## log10(IMDSCORE)   0.0435882  0.0068588   6.3551 2.083e-10
+## log10(AVEINCOME)  1.2144821  0.0286833  42.3412 &lt; 2.2e-16
+## log10(PTAINDEX)   0.0106795  0.0041275   2.5874  0.009671
+## 
+## Rho: 0.4522, LR test value: 1354.5, p-value: &lt; 2.22e-16
+## Asymptotic standard error: 0.012282
+##     z-value: 36.819, p-value: &lt; 2.22e-16
+## Wald statistic: 1355.6, p-value: &lt; 2.22e-16
+## 
+## Log likelihood: 4937.637 for lag model
+## ML residual variance (sigma squared): 0.0077091, (sigma: 0.087801)
+## Number of observations: 4968 
+## Number of parameters estimated: 6 
+## AIC: -9863.3, (AIC for lm: -8510.8)
+## LM test for residual autocorrelation
+## test value: 443.54, p-value: &lt; 2.22e-16</code></pre>
+<p><strong>INTERPRETATION</strong>: The <span class="math inline">\(\rho\)</span> statistic informs us of how the neighbouring LSOA house price values affect the house price at <span class="math inline">\(y\)</span>. The <span class="math inline">\(\rho\)</span> value is a positive value of <code>0.4522</code> which means the neighbouring LSOAs affect is a positive manner, and it is statistically significant (i.e., p-value &lt; <code>0.05</code>). We can see the AIC for the lag model is lower than the original linear regression model (i.e., Lag: <code>-9863.3</code> vs LM: <code>-8510.8</code>) therefore the lag model is okay.</p>
+<p><strong>IMPORTANT NOTE</strong>: In a lag model, do not even try to interpret the coefficients for the independent variables - ignore them and their p-values… they are nonsense! Why? This is because there is a global feedback effect happening here - i.e., whenever we change something in our own region (i.e., LSOA) for instance, like the <code>AVEINCOME</code> in a LSOA, that will not only affect our own house price, but when it causes the house price to go up in its own area, this in turn will cause the house prices to increase in its neighbour’s area; and when the neighbour’s house price go up - it is again going to affect our house price… so its an infinite loop. Instead, we interpret the result churn out from the <code>impact</code> function which reports their <code>direct</code> and <code>indirect</code> effects.</p>
+<p><strong>STEP THREE</strong></p>
+<pre class="r"><code># extract the residuals for modelSLY object and dump back to original sf spatialdatafile object
+spatialdatafile$RESID_SLY &lt;- modelSLY$residuals
+# use Moran&#39;s I test using moran.mc() function
+moran.mc(spatialdatafile$RESID_SLY, Residual_WeightMatrix, 1000, zero.policy = T)</code></pre>
+<pre><code>## 
+##  Monte-Carlo simulation of Moran I
+## 
+## data:  spatialdatafile$RESID_SLY 
+## weights: Residual_WeightMatrix  
+## number of simulations + 1: 1001 
+## 
+## statistic = 0.13417, observed rank = 1001, p-value = 0.000999
+## alternative hypothesis: greater</code></pre>
+<p><strong>INTERPRETATION</strong>: The Moran’s I from the original model was <code>0.4748</code>. Here, it is <code>0.1341</code> which is much lower thus the lag model has accounted for a lot of spatial autocorrelation although it still significantly remains. We can conclude that spatial lag model does address some of the issues of spatial autocorrelation in the model’s residuals but not all since it significantly positive. This is evidenced in the map output of the residual lags.</p>
+<p><strong>IMPORTANT NOTE</strong>: We have to make a mental note of this and compare it with the performance of the Spatial Error Model.</p>
+<pre class="r"><code># generate the map
+tm_shape(spatialdatafile) + tm_fill(&quot;RESID_SLY&quot;, style = &quot;cont&quot;, midpoint = 0, palette = &quot;-RdBu&quot;) +
+    tm_shape(BOROUGHshp) + tm_polygons(alpha = 0, border.alpha = 1, border.col = &quot;black&quot;) +
+    tm_text(&quot;BOROUGHN&quot;, size = &quot;AREA&quot;) +
+    tm_compass(position = c(&quot;right&quot;, &quot;top&quot;)) +
+    tm_scale_bar(position = c(&quot;left&quot;, &quot;bottom&quot;)) +
+    tm_layout(frame = FALSE, legend.title.size = 0.5, legend.text.size = 0.5)</code></pre>
+<p><img src="index_files/figure-html/unnamed-chunk-21-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><strong>STEP FOUR</strong></p>
+<pre class="r"><code># Interpretation of results using impacts
+# impacts
+Weights_2.0 &lt;- as(Residual_WeightMatrix, &quot;CsparseMatrix&quot;)
+trMC &lt;- trW(Weights_2.0, type=&quot;MC&quot;)
+summary(impacts(modelSLY, tr = trMC, R=100), zstats=TRUE)</code></pre>
+<pre><code>## Impact measures (lag, trace):
+##                      Direct   Indirect      Total
+## log10(IMDSCORE)  0.04549157 0.03407862 0.07957020
+## log10(AVEINCOME) 1.26751610 0.94952099 2.21703709
+## log10(PTAINDEX)  0.01114590 0.00834961 0.01949551
+## ========================================================
+## Simulation results ( variance matrix):
+## Direct:
+## 
+## Iterations = 1:100
+## Thinning interval = 1 
+## Number of chains = 1 
+## Sample size per chain = 100 
+## 
+## 1. Empirical mean and standard deviation for each variable,
+##    plus standard error of the mean:
+## 
+##                     Mean       SD  Naive SE Time-series SE
+## log10(IMDSCORE)  0.04562 0.007422 0.0007422      0.0007422
+## log10(AVEINCOME) 1.26928 0.026387 0.0026387      0.0026387
+## log10(PTAINDEX)  0.01088 0.004328 0.0004328      0.0003738
+## 
+## 2. Quantiles for each variable:
+## 
+##                      2.5%      25%     50%     75%   97.5%
+## log10(IMDSCORE)  0.032402 0.040469 0.04610 0.05076 0.05849
+## log10(AVEINCOME) 1.229476 1.251055 1.26728 1.28584 1.32415
+## log10(PTAINDEX)  0.003192 0.007979 0.01125 0.01371 0.01960
+## 
+## ========================================================
+## Indirect:
+## 
+## Iterations = 1:100
+## Thinning interval = 1 
+## Number of chains = 1 
+## Sample size per chain = 100 
+## 
+## 1. Empirical mean and standard deviation for each variable,
+##    plus standard error of the mean:
+## 
+##                      Mean       SD  Naive SE Time-series SE
+## log10(IMDSCORE)  0.034022 0.005253 0.0005253      0.0005253
+## log10(AVEINCOME) 0.948021 0.028339 0.0028339      0.0028339
+## log10(PTAINDEX)  0.008139 0.003280 0.0003280      0.0001944
+## 
+## 2. Quantiles for each variable:
+## 
+##                      2.5%      25%      50%     75%   97.5%
+## log10(IMDSCORE)  0.024297 0.031156 0.034191 0.03725 0.04410
+## log10(AVEINCOME) 0.894938 0.927677 0.954014 0.96687 1.00306
+## log10(PTAINDEX)  0.002246 0.005972 0.008407 0.01032 0.01484
+## 
+## ========================================================
+## Total:
+## 
+## Iterations = 1:100
+## Thinning interval = 1 
+## Number of chains = 1 
+## Sample size per chain = 100 
+## 
+## 1. Empirical mean and standard deviation for each variable,
+##    plus standard error of the mean:
+## 
+##                     Mean       SD  Naive SE Time-series SE
+## log10(IMDSCORE)  0.07964 0.012563 0.0012563      0.0012563
+## log10(AVEINCOME) 2.21730 0.030430 0.0030430      0.0030430
+## log10(PTAINDEX)  0.01902 0.007596 0.0007596      0.0006497
+## 
+## 2. Quantiles for each variable:
+## 
+##                      2.5%     25%     50%     75%   97.5%
+## log10(IMDSCORE)  0.056781 0.07171 0.08026 0.08809 0.10206
+## log10(AVEINCOME) 2.160813 2.19553 2.21715 2.23481 2.28226
+## log10(PTAINDEX)  0.005438 0.01400 0.01958 0.02396 0.03445
+## 
+## ========================================================
+## Simulated standard errors
+##                       Direct    Indirect       Total
+## log10(IMDSCORE)  0.007422257 0.005253003 0.012562739
+## log10(AVEINCOME) 0.026387444 0.028338708 0.030430407
+## log10(PTAINDEX)  0.004327630 0.003279803 0.007595969
+## 
+## Simulated z-values:
+##                     Direct  Indirect     Total
+## log10(IMDSCORE)   6.146614  6.476621  6.339657
+## log10(AVEINCOME) 48.101697 33.453228 72.864687
+## log10(PTAINDEX)   2.513220  2.481530  2.503330
+## 
+## Simulated p-values:
+##                  Direct     Indirect   Total     
+## log10(IMDSCORE)  7.9154e-10 9.3799e-11 2.3028e-10
+## log10(AVEINCOME) &lt; 2.22e-16 &lt; 2.22e-16 &lt; 2.22e-16
+## log10(PTAINDEX)  0.011963   0.013082   0.012303</code></pre>
+<p><strong>INTERPRETATION</strong>: Here is where we derive meaningful interpretation of the coefficients. A big table is churned out - all we care about is the <strong>first</strong> table titled: <code>Impact Measures (lag, trace):</code> and the <strong>last</strong> table titled: <code>Simulated p-values</code>. For instance, let’s interpret the <code>log10(AVEINCOME)</code>(on the log-scale), for the <strong>direct effects</strong> in its own LSOA, if the levels of income were to increase by 1%, this will cause an increase in the property prices by <code>1.267%</code> (p &lt; <code>0.05</code>) in its own LSOA. But for the <strong>indirect affects</strong>, if the <code>log10(AVEINCOME)</code> were to change across neighbouring LSOAs, this will affect the value of our house prices by <code>0.949%</code> (p &lt; <code>0.05</code>). The total column is the combined effect.</p>
+<p><strong>3.3. Spatial Error Models</strong> In a Spatial Error Model, we assume that the error terms are correlated across observations (i.e., the error of an observed value affects the errors of its neighbors).</p>
+<p>We essentially repeat the first 3 steps highlighted in section 3.2. for this analysis:</p>
+<ul>
+<li>Step 1: Fit the Spatial Error Model using the <code>errorsarlm()</code> function.</li>
+<li>Step 2: Use the <code>summary()</code> function to report the results for the <span class="math inline">\(\lambda\)</span> parameter and it’s p-value to check if the model is appropriate than a non-spatial one. You can also check with the AIC.</li>
+<li>Step 3: Extract the residuals errors and carry out a Moran’s I test using <code>moran.mc()</code> to ensure that the statistic is less than what was obtained for the Moran’s I test for the linear model. Use the <code>tmap</code> to examine its spatial patterning.</li>
+</ul>
+<p><strong>STEP ONE</strong></p>
+<pre class="r"><code>modelSER &lt;- errorsarlm(log10(AVEPRICE) ~ log10(IMDSCORE) + log10(AVEINCOME) + log10(PTAINDEX), data = spatialdatafile_2.0, Residual_WeightMatrix)</code></pre>
+<p><strong>STEP TWO</strong></p>
+<pre class="r"><code># Report results with summary()
+# We are interested in the rho-coefficient, log-likelihood ratio test&#39;s p-value and the AIC
+summary(modelSER)</code></pre>
+<pre><code>## 
+## Call:
+## errorsarlm(formula = log10(AVEPRICE) ~ log10(IMDSCORE) + log10(AVEINCOME) + 
+##     log10(PTAINDEX), data = spatialdatafile_2.0, listw = Residual_WeightMatrix)
+## 
+## Residuals:
+##        Min         1Q     Median         3Q        Max 
+## -0.3756388 -0.0458748 -0.0037674  0.0427292  0.6020240 
+## 
+## Type: error 
+## Coefficients: (asymptotic standard errors) 
+##                     Estimate  Std. Error  z value  Pr(&gt;|z|)
+## (Intercept)      -2.99537424  0.14501324 -20.6559 &lt; 2.2e-16
+## log10(IMDSCORE)   0.05526337  0.00896825   6.1621 7.178e-10
+## log10(AVEINCOME)  1.82950617  0.02925677  62.5327 &lt; 2.2e-16
+## log10(PTAINDEX)  -0.00028732  0.00487203  -0.0590     0.953
+## 
+## Lambda: 0.72207, LR test value: 2196, p-value: &lt; 2.22e-16
+## Asymptotic standard error: 0.012525
+##     z-value: 57.65, p-value: &lt; 2.22e-16
+## Wald statistic: 3323.6, p-value: &lt; 2.22e-16
+## 
+## Log likelihood: 5358.42 for error model
+## ML residual variance (sigma squared): 0.0060109, (sigma: 0.07753)
+## Number of observations: 4968 
+## Number of parameters estimated: 6 
+## AIC: -10705, (AIC for lm: -8510.8)</code></pre>
+<p><strong>INTERPRETATION</strong>: The <span class="math inline">\(\lambda\)</span> statistic informs us that if there’s a sudden change in the error term for house prices in neighbouring LSOAs how did it impact the error term for the house price in our LSOA at <span class="math inline">\(y\)</span>. The <span class="math inline">\(\lambda\)</span> value is a positive value of <code>0.7221</code> which means the affect of neighbouring LSOAs are positive and the impact is statistically significant (i.e., p-value &lt; <code>0.05</code>). We can see the AIC for the error model is lower than both the original linear regression &amp; lag model (i.e., Error: <code>-10705.3</code> vs LM: <code>-8510.8</code> &amp; Lag:<code>-9863.3</code>) therefore the error model better than the two.</p>
+<p><strong>IMPORTANT NOTE</strong>: Unlike the lag model, we can interpret the coefficients from the error model for the independent variables! We can interpret them the same way we did for the linear regression model (see <code>section 2.3.</code>).</p>
+<p><strong>STEP THREE</strong></p>
+<pre class="r"><code># extract the residuals for modelSLY object and dump back to original sf spatialdatafile object
+spatialdatafile$RESID_SER &lt;- modelSER$residuals
+# use Moran&#39;s I test using moran.mc() function
+moran.mc(spatialdatafile$RESID_SER, Residual_WeightMatrix, 1000, zero.policy = T)</code></pre>
+<pre><code>## 
+##  Monte-Carlo simulation of Moran I
+## 
+## data:  spatialdatafile$RESID_SER 
+## weights: Residual_WeightMatrix  
+## number of simulations + 1: 1001 
+## 
+## statistic = -0.057944, observed rank = 1, p-value = 0.999
+## alternative hypothesis: greater</code></pre>
+<p><strong>INTERPRETATION</strong>: The Moran’s I from the original model was <code>0.4748</code>. Here, it is <code>-0.0579</code> which is negative and the lowest for the error model. On top of that there is no evidence of spatial autocorrelation since its p-value is not significant. Therefore, we can conclude that the spatial error model does address the issue of spatial autocorrelation in the residuals. Its a better model than the Linear regression and Lag model for exploring the relationship with those independent variables and accounting for spatial autocorrelation. This is also evidenced in the map output of the residual errors.</p>
+<p><strong>IMPORTANT NOTE</strong>:</p>
+<pre class="r"><code># generate the map
+tm_shape(spatialdatafile) + tm_fill(&quot;RESID_SER&quot;, style = &quot;cont&quot;, midpoint = 0, palette = &quot;-RdBu&quot;) +
+    tm_shape(BOROUGHshp) + tm_polygons(alpha = 0, border.alpha = 1, border.col = &quot;black&quot;) +
+    tm_text(&quot;BOROUGHN&quot;, size = &quot;AREA&quot;) +
+    tm_compass(position = c(&quot;right&quot;, &quot;top&quot;)) +
+    tm_scale_bar(position = c(&quot;left&quot;, &quot;bottom&quot;)) +
+    tm_layout(frame = FALSE, legend.title.size = 0.5, legend.text.size = 0.5)</code></pre>
+<p><img src="index_files/figure-html/unnamed-chunk-26-1.png" width="672" style="display: block; margin: auto;" /></p>
+<hr style="border:2px solid gray">
+</hr>
+</div>
+<div id="recommended-reading-list" class="section level2">
+<h2><strong>4. Recommended Reading List</strong></h2>
+<p><strong>4.1. Reading materials </strong></p>
+<ul>
+<li><ol style="list-style-type: decimal">
+<li><strong>Paper</strong>: Guangqing Chi and Jun Zhu (2008) Spatial Regression Models for Demographic Analysis, Popul Res Policy Rev, 27:17-42. <a href="https://link.springer.com/article/10.1007/s11113-007-9051-8"><strong>DOI 10.1007/s11113-007-9051-8</strong></a></li>
+</ol></li>
+<li><ol start="2" style="list-style-type: decimal">
+<li><strong>Book Chapter</strong>: David Darmofal, (2015), Chapter Six: Spatial Lag and Spatial Error Models (2015). Social Analysis for the Social Sciences. Cambridge Press <a href="https://www.cambridge.org/core/books/abs/spatial-analysis-for-the-social-sciences/spatial-lag-and-spatial-error-models/E2266DD3AB2D6C30E3C539BB5190AA8F#access-block"><strong>Gain Access to PDF via Institutional login</strong></a></li>
+</ol></li>
+<li><ol start="3" style="list-style-type: decimal">
+<li><strong>Paper</strong>: Wen-Ching Wang, Yu-Ju Chang &amp; Hsueh-Ching Wang, (2019), An Application of the Spatial Autocorrelation Method on the Change of Real Estate Prices in Taitung City. Int Jour Geo-Information, (8)249, <a href="https://www.mdpi.com/2220-9964/8/6/249"><strong>doi:10.3390/ijgi8060249</strong></a></li>
+</ol></li>
+<li><ol start="4" style="list-style-type: decimal">
+<li><strong>Online Tutorial</strong>: <a href="https://maczokni.github.io/crime_mapping_textbook/spatial-regression-models.html#activity-6-spatial-error-model"><strong>Spatial Regression Models (Crime Mapping in R)</strong></a></li>
+</ol></li>
+</ul>
+</div>
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
